@@ -1,0 +1,16 @@
+#!/bin/bash
+if ls | grep -q "sratoolkit"; then
+    echo "Files with 'sratoolkit' found:"
+    ls *sratoolkit*
+else
+    echo "No files with 'sratoolkit' found."
+    read -p "Do you want to download 'sratoolkit' (yes/no)? " choice
+
+    if [[ "$choice" =~ ^[Yy]$|^yes$ ]]; then
+        wget --output-document sratoolkit.tar.gz https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz
+        tar -zvxf sratoolkit.tar.gz
+        echo "'sratoolkit' downloaded and extracted successfully."
+    else
+        echo "No action taken. Exiting..."
+    fi
+fi
