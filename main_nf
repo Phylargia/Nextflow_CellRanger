@@ -13,7 +13,7 @@ Current Version: Pre-Alpha
 =====================================
 Usage:
           Exome Sequencing of fastq reads using the cellranger module 
-	        Example: nextflow run main_new.nf --genome mouse --input 'input/input.csv'
+	  Example: nextflow run main_new.nf --genome mouse --input 'input/input.csv'
 
 Arguments:
           * --input  : Option to summon an array matrix defining sample(s)/batch provided with pathway  
@@ -39,19 +39,19 @@ Processes:
 =====================================
 Outputs:
       	  * FastQC reports 
-      		      └── Quality control check on raw sequence data	  
+      		└── Quality control check on raw sequence data	  
       
       	  * MultiQC report (HTML)
-      		      └── Aggregated report of FastQC reports
+      		└── Aggregated report of FastQC reports
 	   
       	  * Cellranger Count / Cellranger Aggregate
                 └── Aggregation metrics summary HTML       : ../outs/web_summary.html
                 └── Copy of the input aggregation CSV      : ../outs/aggregation.csv
-                └── Aggregation metrics summary JSON 	     : ../outs/summary.json
+                └── Aggregation metrics summary JSON 	   : ../outs/summary.json
                 └── Secondary analysis output CSV          : ../outs/analysis 
                 └── Filtered feature-barcode matrices MEX  : ../outs/filtered_feature_bc_matrix 
-            		└── Filtered feature-barcode matrices HDF5 : ../outs/filtered_feature_bc_matrix.h5
-            		└── Loupe Browser file                     : ../outs/cloupe.cloupe
+            	└── Filtered feature-barcode matrices HDF5 : ../outs/filtered_feature_bc_matrix.h5
+            	└── Loupe Browser file                     : ../outs/cloupe.cloupe
 =====================================
 Notes:
       	* Pipeline remains in early development (Please contact kit.ourea@gmail.com for assistance)
