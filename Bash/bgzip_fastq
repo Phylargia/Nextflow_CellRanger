@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#SBATCH -p compute
+#SBATCH --mem=20G
+#SBATCH --ntasks=1
+#SBATCH --tasks-per-node=1
+#SBATCH -t 10:00:00
+#SBATCH -o OUT/con.%J
+#SBATCH -e ERR/con.%J
+#SBATCH --job-name=bgzip
+#SBATCH --account=scw1557
+
+# Script to bgzip all fastq files to .gz format
+
+# Define working directory
+wkDir=$(pwd)
+
+# Load modules
+module load bcftools
+
+# Array of input files
+fastq_files=(
+    "SRR9827828_1.fastq"
+    "SRR9827828_2.fastq"
+    "SRR9827830_1.fastq"
+    "SRR9827830_2.fastq"
+)
+
+# Loop through the array and perform bgzip on each file
+for fastq_file in "${fastq_files[@]}"
+do
+    bgzip $myDir/FASTQ_files/"$fastq_file"
+done
