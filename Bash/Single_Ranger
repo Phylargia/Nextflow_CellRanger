@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#SBATCH -p compute
+#SBATCH --mem=40G
+#SBATCH --ntasks=4
+#SBATCH --tasks-per-node=4
+#SBATCH -t 72:00:00
+#SBATCH -o OUT/cell.%J
+#SBATCH -e ERR/cell.%J
+#SBATCH --job-name=single_ranger
+#SBATCH --account=scw1557
+
+# Define working directory
+wkDir=$(pwd)
+
+# Define cellranger
+export PATH=$PATH:/scratch/c.c1845715/cellranger-7.1.0
+
+# Command line to run cellranger on a single paired-end read file 
+cellranger count --localcores 4 --id=test_001 --transcriptome=$wkDir/assembly/refdata-gex-mm10-2020-A/ --fastqs=$wkDir/file/
