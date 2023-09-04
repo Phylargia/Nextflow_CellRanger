@@ -12,7 +12,7 @@ knitr::knit_hooks$set(start_timer = function(before, options, envir) {
     # Execute at the end of the chunk
     if ("name" %in% names(options)) {
       name <- options$name
-      toc(log = TRUE) # End timer and store data in log variable' 
+      toc(log = TRUE) # End timer and store data in log variable
     } else {
       stop("The 'name' option is missing in the chunk options.")
     }
