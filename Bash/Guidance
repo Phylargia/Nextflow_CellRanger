@@ -1,0 +1,57 @@
+# Download Assembly
+curl -O https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-mm10-2020-A.tar.gz
+curl -O https://cf.10xgenomics.com/supp/cell-exp/refdata-gex-GRCh38-2020-A.tar.gz
+tar -zvxf {}
+
+# Download SRAtoolkit
+wget --output-document sratoolkit.tar.gz https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz
+# unzip 
+tar -zvxf sratoolkit.tar.gz
+# Create global variable for pathway to module 
+export PATH=$PATH:$PWD/sratoolkit.3.0.5-ubuntu64/bin
+
+# Download CellRanger
+curl -o cellranger-7.1.0.tar.gz "https://cf.10xgenomics.com/releases/cell-exp/cellranger-7.1.0.tar.gz?Expires=1689131196&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZi4xMHhnZW5vbWljcy5jb20vcmVsZWFzZXMvY2VsbC1leHAvY2VsbHJhbmdlci03LjEuMC50YXIuZ3oiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE2ODkxMzExOTZ9fX1dfQ__&Signature=XCUqmdo6O9KpinDNC4-joqr1JT7jEnl0bXzwX4vZ-iI7Phjsrwg-vbClXZGmQWPtlt427qgFHiJtqXDB43M6l7yeQbTx9L8tqJRyObBnc4C65Ova2cz~oiFNC1qYL1gAYC1~eDKxMSuPbr-M03MCAmBWy0eduWE~ijDy~G4fTySgDw9RwxbIgUNWfQxPjqa3dvtRNDR5z0UIprWIqPfmFsbmxWWJlgeutlnFS1CuaVQv7u8r0X7rTHpRLKF48NbfaSDM-T9jY46tQUE-42UdpxqtigRaNEjzqdroIK9mY5F7-~Mwzks0CvX-ntFEXFdi5LUY-6W504NN1jHBuQSNjw__&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA"
+# unzip
+tar -zvxf cellranger
+# Create global variable for pathway to module 
+export PATH=$PATH:/scratch/c.c1845715/cellranger-7.1.0
+
+# Prefetch and split paired-end fastq files using SRAtoolkit
+# Optional, use prefetch 
+prefetch --max-size 25G SRR9827828
+prefetch --max-size 30G SRR9827830
+
+# Optional, validate structural format 
+vdb-validate SRR9827828
+vdb-validate SRR9827830
+
+# Split to pair-end reads (Will download temporary files if prefetch was not called)
+# Be sure to use the –split-3 option, which splits mate-pair reads into separate files
+# For paired-end data, the file names will be suffixed 1.FASTQ and 2.FASTQ; otherwise, a single file with extension .FASTQ will be produced
+fasterq-dump --split-3 --progress SRR9827828
+fasterq-dump --split-3 --progress SRR9827830
+
+# Best practice:
+# Utilise parallelisation to perform fasterq-dump and gzip through a SraRunTable
+# SraRunTables can be generated directly from NCBI
+# Otherwise:
+# Create the file using touch
+touch SRR_Acc_List.txt
+
+# Add the content to the file using echo and the append (>>) operator
+echo "SRR9827828" >> SRR_Acc_List.txt
+echo "SRR9827830" >> SRR_Acc_List.txt
+
+# Load Module
+module load parallel
+
+# Extract the accessions from the SraRunTable and perform fasterq split and gzip compression
+cat SRR_Acc_List.txt | parallel -j 2 "fasterq-dump {} --split-3 --progress -O FASTQ_files/ && gzip FASTQ_files/{}_*"
+
+# Files should be renamed at this stage to be compatible with cellranger
+# For example, ("${sraID}_S1_L001_R{1 or 2}_001.fastq.gz")
+
+
+
+
