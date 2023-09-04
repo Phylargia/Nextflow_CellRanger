@@ -1,0 +1,18 @@
+#!/bin/bash
+if ls | grep -q "cellranger-7.1.0"; then
+    echo "Files with 'cellranger-7.1.0' found:"
+    ls *cellranger-7.1.0*
+else
+    echo "No files with 'cellranger-7.1.0' found."
+    read -p "Do you want to download 'cellranger-7.1.0' (yes/no)? " choice
+
+    if [[ "$choice" =~ ^[Yy]$|^yes$ ]]; then
+        
+curl -o cellranger-7.1.0.tar.gz "https://cf.10xgenomics.com/releases/cell-exp/cellranger-7.1.0.tar.gz?Expires=1689131196&Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiaHR0cHM6Ly9jZi4xMHhnZW5vbWljcy5jb20vcmVsZWFzZXMvY2VsbC1leHAvY2VsbHJhbmdlci03LjEuMC50YXIuZ3oiLCJDb25kaXRpb24iOnsiRGF0ZUxlc3NUaGFuIjp7IkFXUzpFcG9jaFRpbWUiOjE2ODkxMzExOTZ9fX1dfQ__&Signature=XCUqmdo6O9KpinDNC4-joqr1JT7jEnl0bXzwX4vZ-iI7Phjsrwg-vbClXZGmQWPtlt427qgFHiJtqXDB43M6l7yeQbTx9L8tqJRyObBnc4C65Ova2cz~oiFNC1qYL1gAYC1~eDKxMSuPbr-M03MCAmBWy0eduWE~ijDy~G4fTySgDw9RwxbIgUNWfQxPjqa3dvtRNDR5z0UIprWIqPfmFsbmxWWJlgeutlnFS1CuaVQv7u8r0X7rTHpRLKF48NbfaSDM-T9jY46tQUE-42UdpxqtigRaNEjzqdroIK9mY5F7-~Mwzks0CvX-ntFEXFdi5LUY-6W504NN1jHBuQSNjw__&Key-Pair-Id=APKAI7S6A5RYOXBWRPDA"
+        tar -zvxf cellranger.tar.gz
+        echo "'cellranger-7.1.0' downloaded and extracted successfully."
+    else
+        echo "No action taken. Exiting..."
+    fi
+fi
+
