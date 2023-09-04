@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#SBATCH -p compute
+#SBATCH --mem=40G
+#SBATCH --ntasks=4
+#SBATCH --tasks-per-node=4
+#SBATCH -t 72:00:00
+#SBATCH -o OUT/aggr.%J
+#SBATCH -e ERR/aggr.%J
+#SBATCH --job-name=Aggr
+#SBATCH --account=scw1557
+
+# Define cellranger
+export PATH=$PATH:/scratch/c.c1845715/cellranger-7.1.0
+
+# Define output directory and run command line for cellranger aggregation provided samples outlined in a aggr_input.csv 
+cd /scratch/c.c1845715/output/ && cellranger aggr --id=test001 --csv=/scratch/c.c1845715/aggr_input.csv
