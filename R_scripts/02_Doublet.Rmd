@@ -1,0 +1,161 @@
+---
+title: "02_DoubletFinder"
+author: "Christopher O'Connor"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Chunk timer 
+library(tictoc)
+source("E:/timer_hook.R")
+```
+
+## Library
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(Seurat)
+library(SeuratDisk)
+library(DoubletFinder)
+```
+
+## Read in Data
+
+```{r}
+setwd("E:")
+sobj <- LoadH5Seurat("../01_k23_object.h5Seurat")
+```
+
+```{r}
+imm <- sobj
+head(imm@meta.data)
+```
+
+```{r}
+# Remove excess objects
+rm(sobj)
+
+# Scale Data 
+imm <- ScaleData(imm )
+```
+
+## 1.  Doublet Analysis
+
+### 1.1 pK Identification
+
+```{r pK_Identification, start_timer=TRUE, name = "pK_Identification_chunk"}
+# pK Identification ~ no ground truth 
+sweep.res.list_imm <- paramSweep_v3(imm, PCs = 1:10, sct = FALSE)
+sweep.stats_imm <- summarizeSweep(sweep.res.list_imm, GT = FALSE)
+fpk_imm <- find.pK(sweep.stats_imm)
+```
+
+```{r}
+# Annotated visual
+ggplot(fpk_imm, aes(pK, BCmetric, group = 1)) +
+  geom_point() +
+  geom_line()
+```
+
+```{r}
+# Save peak as value # graph shows 0.26
+pK <- fpk_imm %>%
+  filter(BCmetric == max(BCmetric)) %>%
+  select(pK)
+
+pK <- as.numeric(as.character(pK[[1]]))
+```
+
+```{r DoubletAnn, start_timer=TRUE, name = "Doublet_Annotation_chunk"}
+# Calculate the expected number of doublets
+annotations <- imm@meta.data$seurat_clusters # which cell cluster
+homotypic.prop <- modelHomotypic(annotations)
+
+nExp_poi <- round(0.033*nrow(imm@meta.data)) # get value from estimate cr x10guide
+nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
+```
+
+### 1.2 Run DoubletFinder
+
+```{r DoubletFinder, start_timer=TRUE, name = "DoubletFinder_chunk"}
+imm <- doubletFinder_v3(imm, 
+                         pN = 0.25, 
+                         pK = pK,
+                         nExp = nExp_poi.adj, 
+                         PCs = 1:10, 
+                         sct = FALSE, 
+                         reuse.pANN = FALSE)
+```
+
+### 1.3 Extract Meta Data
+
+```{r}
+# Define the pattern to match columns containing "DF.classifications_"
+pattern <- "DF\\.classifications_"
+
+# Use grep to find column names that match the pattern
+classification <- colnames(imm@meta.data)[grep(pattern, colnames(imm@meta.data))]
+sequence <- sub(paste0(".*", pattern), "", classification) 
+
+table(imm@meta.data[, classification])
+DF.class = colnames(imm@meta.data)[colnames(imm@meta.data) == classification]
+```
+
+## 2. Visualise Plots
+
+### 2.1 Sample-Sample
+
+```{r}
+# Visualise doublets across samples and umap
+cowplot::plot_grid(ncol = 2, DimPlot(imm, group.by = "sample") + NoAxes(),
+                    DimPlot(imm, group.by = DF.class) + NoAxes())
+```
+
+### 2.2 UMAP
+
+```{r}
+# UMAP Plot 
+group_colours <- c("Doublet" = "red", "Singlet" = "gray")
+DimPlot(imm, group.by = DF.class, cols = group_colours)
+```
+
+### 2.3 Sample-Sample : UMAP
+
+```{r}
+# Sample comparison
+DimPlot(imm, group.by = DF.class, split.by = "sample", cols = group_colours)
+```
+
+### 2.4 Doublet-Singlet : Vln
+
+```{r}
+VlnPlot(imm, features = "nFeature_RNA", group.by = DF.class, pt.size = 0.1)
+
+VlnPlot(imm, features = "nFeature_RNA", group.by = DF.class, split.by = "sample", pt.size = 0.1)
+```
+
+## 3. Remove Doublets
+
+```{r}
+# Remove all predicted doublets 
+imm = imm[, imm@meta.data[, DF.class] == "Singlet"]
+```
+
+## Save Object
+
+```{r}
+# Save object ready for 03_DEG.R
+SaveH5Seurat(imm, filename = "02_k23_object.h5Seurat", overwrite = TRUE)
+```
+
+## Timer
+
+```{r}
+log.txt <- tic.log(format = TRUE)
+log.txt
+```
