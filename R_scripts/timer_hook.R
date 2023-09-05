@@ -1,3 +1,4 @@
+# R script designed to operate as a knitr chunk function. It captures the time taken for a chunk to run. 
 # Timer hook
 knitr::knit_hooks$set(start_timer = function(before, options, envir) {
   if (before) {
