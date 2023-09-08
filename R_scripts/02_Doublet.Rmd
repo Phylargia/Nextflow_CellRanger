@@ -1,5 +1,5 @@
 ---
-title: "02_DoubletFinder"
+title: "Remove Doublets with DoubletFinder"
 author: "Christopher O'Connor"
 date: "`r Sys.Date()`"
 output: html_document
