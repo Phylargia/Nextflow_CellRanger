@@ -121,9 +121,9 @@ FeatureScatter(imm, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 ```{r Subset, start_timer=TRUE, name = "Subset_chunk"}
 # Subset with thresholds based on feature plots
 imm <- subset(imm, 
-               subset = nFeature_RNA > 200 & 
-                        nFeature_RNA < 8000 & 
-                        percent_mito < 5)
+              subset = nFeature_RNA > 200 & 
+                       nFeature_RNA < 8000 & 
+                       percent_mito < 5)
 ```
 
 ```{r}
@@ -237,7 +237,7 @@ DimHeatmap(imm, dims = 6:10, cells = 500, balanced = TRUE)
 ## Determine Dimensionality
 
 ```{r}
-# Method 2 instead of jackstraw
+# Visualise
 ElbowPlot(imm)
 ```
 
