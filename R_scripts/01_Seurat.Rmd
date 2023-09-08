@@ -123,7 +123,7 @@ FeatureScatter(imm, feature1 = "nCount_RNA", feature2 = "nFeature_RNA")
 imm <- subset(imm, 
                subset = nFeature_RNA > 200 & 
                         nFeature_RNA < 8000 & 
-                        percent_mito < 10)
+                        percent_mito < 5)
 ```
 
 ```{r}
